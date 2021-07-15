@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>随机数-避免不必要的重新渲染</title>
+    <script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+  <!-- 随机数-避免不必要的重新渲染  -->
+  <script type="text/babel">
+    class App extends React.PureComponent {
+      state = {
+        number: 0,
+        obj: {
+          count: 0,
+        },
+      };
+      handleClick = () => {
+        //错误演示，直接修改原始对象中属性的值
+        /*  const newObj = this.state.obj;
+        newObj.count = Math.floor(Math.random() * 3);
+         */
+
+        //正确演示
+        const newObj = { ...this.state, count: Math.floor(Math.random() * 3) };
+        this.setState(() => {
+          return {
+            obj: newObj,
+          };
+        });
+
+        /*   this.setState(() => {
+          return {
+            // [0,3) 整数
+            number: Math.floor(Math.random() * 3),
+          };
+        }); */
+      };
+      //两次生成的随机数可能相同,相同就不重新渲染
+      /* shouldComponentUpdate(nextProps, nextState) {
+        console.log(
+          "原来的随机数：",
+          this.state,
+          "，现在的随机数：",
+          nextState.number
+        );
+        if (this.state.number !== nextState.number) {
+          return true;
+        }
+        console.log("不重新渲染");
+        return false;
+
+        //简化写法
+        // return this.state.number !== nextState.number
+      } */
+
+      /* render方法调用并不意味着浏览器中的重新渲染！！!仅仅说明要进行diff */
+      render() {
+        // console.log("-----render---");
+        const el = (
+          <div>
+            {/* <h1>随机数 : {this.state.number}</h1> */}
+            {/*  <NumberBox number={this.state.number} /> */}
+            <h1>随机数：{this.state.obj.count}</h1>
+            <button onClick={this.handleClick}>重新生成</button>
+          </div>
+        );
+        console.log(el);
+        return el;
+      }
+    }
+
+    class NumberBox extends React.Component {
+      /*   shouldComponentUpdate(nextProps, nextState) {
+        console.log(
+          "以前props：",
+          this.props.number,
+          "现在props：",
+          nextProps.number
+        );
+        return nextProps.number !== this.props.number;
+      } */
+      render() {
+        console.log("----子组件中的render---");
+        return <h1>随机数 : {this.props.number}</h1>;
+      }
+    }
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</html>

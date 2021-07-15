@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>组件</title>
+    <script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+  <!-- 创建组件的两种方式： 函数、class -->
+  <script type="text/babel">
+    /*  函数组件 ：名称以大写字母开头，必须有返回值(表该组件结构) */
+    /* function Hello() {
+      return <div>这是第一个函数组件</div>;
+    } */
+
+    // 箭头函数
+    const Hello = () => {
+      return <div>这是第一个函数组件</div>; //如果不要 可以return null
+    };
+
+    // ReactDOM.render(<Hello />, document.getElementById("root"));
+
+    /* 类组件 : 大写字母开头，
+    继承React.Component父类，从而可以使用父类提供的方法或属性，
+    必须提供render()方法,
+    render()必须有返回值，表组件结构 */
+
+    class HelloClass extends React.Component {
+      render() {
+        return <div>Hello Class Component!</div>;
+      }
+    }
+
+    // ReactDOM.render(<HelloClass />, document.getElementById("root"));
+  </script>
+
+  <!-- 事件绑定 -->
+  <script type="text/babel">
+    /* 类组件形式，将函数写在类中 */
+    class App extends React.Component {
+      handleClick() {
+        console.log("单机事件");
+      }
+      render() {
+        return <button onClick={this.handleClick}>点击我，触发事件</button>;
+      }
+    }
+    // ReactDOM.render(<App />, document.getElementById("root"));
+
+    //* 函数组件形式，绑定事件 在内部写函数 */
+    function App2() {
+      function handleClick() {
+        console.log("函数形式，点击事件");
+      }
+      return <button onClick={handleClick}>点击我</button>;
+    }
+    // ReactDOM.render(<App2 />, document.getElementById("root"));
+  </script>
+
+  <!-- 事件对象 react：合成事件（兼容所有浏览器） -->
+  <script type="text/babel">
+    class Event extends React.Component {
+      handleClick(e) {
+        e.preventDefault(); //阻止默认事件
+        console.log("事件参数e：", e);
+      }
+      render() {
+        return (
+          <a href='http://www.baidu.com' onClick={this.handleClick}>
+            这是一个a标签,点击后不跳转
+          </a>
+        );
+      }
+    }
+    // ReactDOM.render(<Event />, document.getElementById("root"));
+  </script>
+
+  <!-- state,setState()基本使用 -->
+  <script type="text/babel">
+    class State extends React.Component {
+      /* constructor() {
+        super();
+        this.onIncrement = this.onIncrement.bind(this); //2.bind()改变函数内部this的指向
+        //初始化state
+        this.state = {
+          count: 0,
+        };
+      } */
+
+      //es6 简化上面的语法
+      state = {
+        count: 0,
+      };
+
+      /*       onIncrement() {
+        console.log("事件处理程序中的this", this); //这里的this是undefined，在下面的render中this指向的是组件实例
+        this.setState({ count: this.state.count + 1 });
+      } */
+
+      // 3.箭头函数形式的class实例方法
+      onIncrement = () => {
+        this.setState({ count: this.state.count + 1 });
+      };
+      render() {
+        return (
+          // 1.利用箭头函数来改变onIncrement函数中this指向
+          /* <div>
+            <h1>计数器：{this.state.count}</h1>
+            <button onClick={() => this.onIncrement()}>count : +1</button>
+          </div> */
+
+          // 2.利用bind()来改变onIncrement函数中this指向
+          <div>
+            <h1>计数器：{this.state.count}</h1>
+            <button onClick={this.onIncrement}>count : +1</button>
+          </div>
+        );
+      }
+    }
+    ReactDOM.render(<State />, document.getElementById("root"));
+  </script>
+</html>

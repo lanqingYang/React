@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>setState原理</title>
+    <script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+  <!-- setState是异步的  -->
+  <script type="text/babel">
+    class App extends React.Component {
+      state = {
+        count: 1,
+      };
+
+      handelClick = () => {
+        /* this.setState({
+          count: this.state.count + 1,
+        });
+        console.log(this.state.count); // 1 显示的是未+1前的
+
+        this.setState({
+          count: this.state.count + 1, //这里拿到的count也是1 所以 此时更新的count 也是2
+        }); */
+
+        // 推荐语法
+        //注意 ：这种语法也是异步更新state的
+        //但是这个state是最新状态的state
+        this.setState((state, props) => {
+          return {
+            count: state.count + 1,
+          };
+        });
+        this.setState((state, props) => {
+          console.log("第二次调用：", state.count); //2
+          return {
+            count: state.count + 1,
+          };
+        });
+        console.log(this.state.count); //1
+
+        // 第二参数的使用
+        this.setState(
+          (state, props) => {},
+          //状态更新后，并且重新渲染后，立即执行
+          () => {
+            console.log("steState第二参数:回调函数，会在状态更新后立即执行");
+            console.log(this.state.count); //3
+          }
+        );
+      };
+
+      render() {
+        // console.log("render被触发了 "); //多次setState（），只重新渲染一次
+        return (
+          <div>
+            <h1>count: {this.state.count}</h1>
+            <button onClick={this.handelClick}>+1</button>
+          </div>
+        );
+      }
+    }
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</html>

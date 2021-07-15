@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>组件复用： render-prps、高阶组件</title>
+    <script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+  <!-- 1.render-props模式  -->
+  <script type="text/babel">
+    class Mouse extends React.Component {
+      state = {
+        x: 0,
+        y: 0,
+      };
+      //鼠标移动事件的处理
+      handleMouseMove = (e) => {
+        this.setState({
+          x: e.clientX,
+          y: e.clientY,
+        });
+      };
+
+      //监听鼠标移动事件
+      componentDidMount() {
+        window.addEventListener("mousemove", this.handleMouseMove);
+      }
+
+      render() {
+        return this.props.render(this.state);
+      }
+
+      //优化1：组件卸载的时候，解除mousemouve事件绑定
+      componentWillUnmoutn() {
+        window.removeEventListener("mousemove", this.handleMouseMove);
+      }
+    }
+
+    /*     //优化2:添加属性校验
+    Mouse.propTypes={
+      render:PropTypes.func.isRequired
+      //如果是children形势，就把render改为children
+    } */
+
+    class App extends React.Component {
+      render() {
+        return (
+          <div>
+            <h1>render-props 模式</h1>
+            {/* <Mouse
+              render={(mouse) => {
+                return (
+                  <p>
+                    鼠标坐标为：{mouse.x},{mouse.y}
+                  </p>
+                );
+              }}
+            /> */}
+            {/* 图片跟随鼠标动 */}
+            <Mouse
+              render={(mouse) => {
+                return (
+                  <img
+                    src='../Pics/wangji-rabit.jpg'
+                    alt='小鸡鼠标'
+                    style={{
+                      position: "absolute",
+                      top: mouse.y - 100,
+                      left: mouse.x - 100,
+                      width: "200px",
+                    }}
+                  />
+                );
+              }}
+            />
+          </div>
+        );
+      }
+    }
+    {
+      /* children 代替 render属性更易理解
+  <Mouse>{(mouse)=>{
+   <p>鼠标当前位置:{mouse.x} ,{mouse.y}</p>
+}} 
+Mouse/>
+
+//组件内部
+this.props.children(this.state) */
+    }
+    // ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+
+  <!-- 2.高阶组件  -->
+  <script type="text/babel">
+    // 创建高阶组件
+    function withMouse(WrappedComponent) {
+      // 该组件提供复用的逻辑状态
+      class Mouse extends React.Component {
+        state = {
+          x: 0,
+          y: 0,
+        };
+
+        handleMouseMove = (e) => {
+          this.setState({
+            x: e.clientX,
+            y: e.clientY,
+          });
+        };
+
+        //控制鼠标状态逻辑
+        componentDidMount() {
+          window.addEventListener("mousemove", this.handleMouseMove);
+        }
+
+        //解除状态
+        componentWillUnmoutn() {
+          window.removeEventListener("mousemove", this.handleMouseMove);
+        }
+
+        render() {
+          console.log("Mouse:", this.props); //Mouse组件中可以拿到 a=1
+          return <WrappedComponent {...this.state} {...this.props} />;
+        }
+      }
+
+      //设置displayName
+      Mouse.displayName = `withMouse${getDisplayName(WrappedComponent)}`;
+
+      return Mouse;
+    }
+
+    function getDisplayName(WrappedComponent) {
+      return (
+        WrappedComponent.displayName || WrappedComponent.name || "Component"
+      );
+    }
+
+    // 测试高阶组件
+    const Position = (props) => {
+      console.log("Positon:", props);
+      return (
+        <p>
+          当前鼠标位置：（x:{props.x},y:{props.y}）
+        </p>
+      );
+    };
+
+    const Rabit = (props) => (
+      <img
+        src='../Pics/wangji-rabit.JPG'
+        alt='兔子'
+        style={{
+          position: "absolute",
+          top: props.y - 100,
+          left: props.x - 100,
+          width: "200px",
+        }}
+      />
+    );
+
+    //获取增强后的组件
+    const MousePosition = withMouse(Position);
+    const RabitPosition = withMouse(Rabit);
+
+    class App extends React.Component {
+      render() {
+        return (
+          <div>
+            {/* 渲染增强后的组件 */}
+            <h1>高阶组件</h1>
+            <MousePosition a='1' />
+            <RabitPosition />
+          </div>
+        );
+      }
+    }
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</html>

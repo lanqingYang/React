@@ -1,0 +1,27 @@
+.parent {
+  background-color: cornflowerblue;
+  height: 100px;
+  padding: 20px;
+}
+.child {
+  background-color: burlywood;
+  /* height: 50%; */
+}
+
+/* 跨组件通信 */
+.app {
+  background-color: cornflowerblue;
+  padding: 10px;
+}
+.node {
+  padding: 10px;
+  background-color: darkcyan;
+}
+.subnode {
+  padding: 10px;
+  background-color: darkgoldenrod;
+}
+.child5 {
+  background-color: darkseagreen;
+  height: 30px;
+}

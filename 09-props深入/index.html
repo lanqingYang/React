@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>props深入</title>
+    <script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+  <!-- 1.children属性 -->
+  <script type="text/babel">
+    const Test = () => {
+      return <button>一个组件</button>;
+    };
+    const App = (props) => {
+      console.log(props);
+      return (
+        <div>
+          <h1>组件标签的子节点: {props.children}</h1>
+        </div>
+      );
+    };
+    // ReactDOM.render(
+    //   <App>
+    //     我是子节点 <p>我是标签子节点</p>
+    //     <Test></Test>
+    //   </App>,
+    //   document.getElementById("root")
+    // );
+  </script>
+
+  <!-- 2.props校验 -->
+  <script type="text/babel">
+    const Root = (props) => {
+      const arr = props.colors;
+      const lis = arr.map((item, index) => <li key={index}>{item.name}</li>);
+      return <ul>{lis}</ul>;
+    };
+    ReactDOM.render(<Root colors={19} />, document.getElementById("root"));
+
+    // 1.安装包 props-types 2.导入包 (在项目中用，这里只写代码)
+    Root.propTypes = {
+      //约定colors属性为array类型
+      //类型不对，报出明确错误
+      colors: PropTypes.array,
+    };
+
+    //常见校验规则
+    /* 
+    a: number类型
+    fn：func类型且必须填写
+    tag： React元素
+    filter： 对象 （{area：'上海',price:1000}）
+    */
+    Root.propTypes = {
+      a: PropTypes.number,
+      fn: PropTypes.func.isRequired,
+      tag: PropTypes.element,
+      filter: PropTypes.shape({
+        area: PropTypes.string,
+        price: PropTypes.number,
+      }),
+    };
+
+    // 默认值，分页大小不设置，就为10
+    Root.defaultProps = {
+      pageSize: 10,
+    };
+    //设置了pageSize就为20
+    // ReactDOM.render(<Root pageSize={20} />, document.getElementById("root"));
+  </script>
+</html>

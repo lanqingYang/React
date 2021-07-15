@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3种通讯方式</title>
+    <script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+    <script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+  <!--1. 父子通讯 -->
+  <script type="text/babel">
+    class Father extends React.Component {
+      state = {
+        lastName: "唐",
+      };
+      render() {
+        return (
+          <div className='parent'>
+            父组件：
+            <Child name={this.state.lastName}></Child>
+          </div>
+        );
+      }
+    }
+
+    //  子组件
+    class Child extends React.Component {
+      render() {
+        return (
+          <div className='child'>
+            <p>子组件,接收到父组件的数据：{this.props.name}</p>
+          </div>
+        );
+      }
+    }
+
+    // ReactDOM.render(<Father />, document.getElementById("root"));
+  </script>
+
+  <!--2. 子父通讯 -->
+  <script type="text/babel">
+    class Father2 extends React.Component {
+      state = {
+        parentMes: "",
+      };
+
+      //  提供一个回调函数,用来接收数据
+      getChildMes = (data) => {
+        console.log("接收到子组件中传来的数据：", data);
+        this.setState({
+          parentMes: data,
+        });
+      };
+      render() {
+        return (
+          <div className='parent'>
+            父组件,接收到子组件的参数:{this.state.parentMes}
+            <Child2 getMes={this.getChildMes}></Child2>
+          </div>
+        );
+      }
+    }
+
+    //  子组件
+    class Child2 extends React.Component {
+      state = {
+        childMes: "111",
+      };
+      hanldeClick = () => {
+        this.props.getMes(this.state.childMes);
+      };
+      render() {
+        return (
+          <div className='child'>
+            <p>子组件</p>
+            <button onClick={this.hanldeClick}>点我，给父组件传递数据</button>
+          </div>
+        );
+      }
+    }
+
+    // ReactDOM.render(<Father2 />, document.getElementById("root"));
+  </script>
+
+  <!--3. 兄弟通讯 -->
+  <script type="text/babel">
+    class Counter extends React.Component {
+      //提供共享状态
+      state = {
+        count: 0,
+      };
+
+      addCount = (data) => {
+        this.setState({
+          count: this.state.count + data,
+        });
+      };
+      render() {
+        return (
+          <div>
+            <Child3 count={this.state.count}></Child3>
+            <Child4 addCount={this.addCount}></Child4>
+          </div>
+        );
+      }
+    }
+
+    const Child3 = (props) => {
+      return <h1>计数器: {props.count}</h1>;
+    };
+
+    class Child4 extends React.Component {
+      hanldeClick = () => {
+        this.props.addCount(1);
+      };
+      render() {
+        return <button onClick={this.hanldeClick}>+1</button>;
+      }
+    }
+    // ReactDOM.render(<Counter />, document.getElementById("root"));
+  </script>
+
+  <!-- 跨组件传递！ Context！！ -->
+  <script type="text/babel">
+    // 1.创建context得到两个组件
+    const { Provider, Consumer } = React.createContext();
+
+    class App extends React.Component {
+      render() {
+        return (
+          //2. 使用Provider作为父节点
+          <Provider value='pink'>
+            <div className='app'>
+              <Node />
+            </div>
+          </Provider>
+        );
+      }
+    }
+
+    const Node = (props) => {
+      return (
+        <div className='node'>
+          <SubNode></SubNode>
+        </div>
+      );
+    };
+
+    const SubNode = (props) => {
+      return (
+        <div className='subnode'>
+          <Child5></Child5>
+        </div>
+      );
+    };
+
+    const Child5 = (props) => {
+      return (
+        <div className='child5'>
+          <Consumer>{(data) => <span>我是子节点 -- {data}</span>}</Consumer>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</html>

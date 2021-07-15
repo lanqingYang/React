@@ -1,0 +1,18 @@
+.app {
+  border: 1px solid black;
+  width: 260px;
+  overflow: hidden;
+}
+
+/* a + b:相邻兄弟选择器,所有紧跟在a后面的b元素(1个)
+    a ~ b:a元素后所有是b元素的兄弟节点
+   a > b:所有子元素，a后的所有b元素
+*/
+.app > div:first-child {
+  /* background-color: rosybrown; */
+  margin-left: 10px;
+}
+
+.user {
+  margin-bottom: 10px;
+}
